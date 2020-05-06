@@ -55,7 +55,7 @@ class CloudburstConnection():
         local: A boolean representin whether the client is interacting with the
         cluster in local or cluster mode.
         '''
-
+        print('Starting...')
         self.service_addr = 'tcp://' + func_addr + ':%d'
         self.context = zmq.Context(1)
         kvs_addr = self._connect()
@@ -64,13 +64,13 @@ class CloudburstConnection():
         # running in local mode.
         self.kvs_client = AnnaTcpClient(kvs_addr, ip, local=local,
                                         offset=tid + 10)
-
+        print('kvs established')
         self.func_create_sock = self.context.socket(zmq.REQ)
         self.func_create_sock.connect(self.service_addr % FUNC_CREATE_PORT)
-
+        
         self.func_call_sock = self.context.socket(zmq.REQ)
         self.func_call_sock.connect(self.service_addr % FUNC_CALL_PORT)
-
+        print('func sock established')
         self.list_sock = self.context.socket(zmq.REQ)
         self.list_sock.connect(self.service_addr % LIST_PORT)
 
@@ -82,12 +82,12 @@ class CloudburstConnection():
 
         self.dag_delete_sock = self.context.socket(zmq.REQ)
         self.dag_delete_sock.connect(self.service_addr % DAG_DELETE_PORT)
-
+        print('dag sock created')
         self.response_sock = self.context.socket(zmq.PULL)
         response_port = 9000 + tid
         self.response_sock.setsockopt(zmq.RCVTIMEO, 1000)
         self.response_sock.bind('tcp://*:' + str(response_port))
-
+        print('response sock created')
         self.response_address = 'tcp://' + ip + ':' + str(response_port)
 
         self.rid = 0
